@@ -5,8 +5,8 @@ EXE := tp2
 SRC := $(wildcard $(SRC_DIR)/*.c)
 OBJ := $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
-CFLAGS   := -Wall -Iinclude -g
-LDFLAGS  := -Llib
+CFLAGS   := -Wall -Iinclude -g -pthread
+LDFLAGS  := -Llib -pthread
 LDLIBS   := 
 
 .PHONY: all clean
