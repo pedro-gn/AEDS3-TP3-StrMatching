@@ -1,6 +1,5 @@
-5
+4
 ava av
 patapon npatapatapatapo
 isitfriday ohnoitisnt
 haskell lleksah
-teste abetesteabe

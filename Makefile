@@ -1,11 +1,11 @@
 SRC_DIR := src
 OBJ_DIR := obj
 
-EXE := tp2
+EXE := tp3
 SRC := $(wildcard $(SRC_DIR)/*.c)
 OBJ := $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
-CFLAGS   := -Wall -Iinclude -g -pthread
+CFLAGS   := -Iinclude -g -pthread
 LDFLAGS  := -Llib -pthread
 LDLIBS   := 
 

@@ -6,28 +6,42 @@ Tests *createTests(char *fileName){
 
     Tests *tests;
     tests = (Tests *)malloc(sizeof(Tests));
+    tests->fileName = malloc(strlen(fileName) * sizeof(char) +1);
 
-    tests->fileName = malloc(strlen(fileName) * sizeof(char));
+    // Nome do arquivo
     strcpy(tests->fileName,fileName);
-
 
     FILE *f = fopen(fileName, "r");
 
+    // N de testes
     fscanf(f," %d ", &tests->ntests);
     
+    // Alloca memoria para a quantidade de testes
     tests->texts = (char**)malloc(tests->ntests *  sizeof(char*));
     tests->patterns = (char**)malloc(tests->ntests *  sizeof(char*));
+
     for(int i = 0; i < tests->ntests; i++){
         tests->texts[i] = malloc(MAX_TEXT_SIZE * sizeof(char));
         tests->patterns[i] = malloc(MAX_PATTERN_SIZE * sizeof(char));
         fscanf(f, " %s %s ", tests->patterns[i], tests->texts[i]);
+
+        // Simula o formato circular da pedra
+        char *temp = malloc(strlen(tests->patterns[i]) * sizeof(char) + 1);
+        strcat(tests->texts[i], strncpy(temp, tests->texts[i], strlen(tests->patterns[i])));
+
+        while(strlen(tests->patterns[i]) > strlen(tests->texts[i])){
+            char *temp = malloc(strlen(tests->texts[i]) * sizeof(char) + 1);
+            strcat(tests->texts[i], strncpy(temp, tests->texts[i], strlen(tests->texts[i])));
+            free(temp);
+        }
+        free(temp);
     }
 
     fclose(f);
-
     return tests;
 }
 
+// Escreve o resultado no arquivo de saida
 void writeText(int **results, int nresults, char *fileName){
     char *name;
     FILE *f;
@@ -67,7 +81,11 @@ void freeTests(Tests *tests){
 void execTests(Tests *tests, int strmatchAlgo){
 
     pthread_t threads[tests->ntests]; //threads
-    int *results[tests->ntests]; //resultados dos testes
+    // Array de retorno com os resultados dos threds
+    int *results[tests->ntests]; 
+    for (int i = 0; i < tests->ntests; i++) {
+        results[i] = malloc(sizeof(int)); // ou o tamanho adequado para armazenar o resultado
+    }
 
     // Cria as threads
     for(int i = 0; i < tests->ntests; i++){
@@ -83,8 +101,10 @@ void execTests(Tests *tests, int strmatchAlgo){
             pthread_create(&threads[i], NULL, bruteforce, (void*)args);
             break;
         case 2:
+            pthread_create(&threads[i], NULL, BMHSearch, (void*)args);
             break;
         case 3:
+            pthread_create(&threads[i], NULL, shiftAnd, (void*)args);
             break;
         default:
             printf("Algoritmo Invalido!!");
@@ -95,10 +115,10 @@ void execTests(Tests *tests, int strmatchAlgo){
 
     // Aguarda o término das threads
     for (int i = 0; i < tests->ntests; i++) {
-        pthread_join(threads[i], (void**)&results[i]);
-   
+        pthread_join(threads[i], (void**)&(results[i]));
     }
 
 
+    // Escreve os resultados no arquivo de saida
     writeText(results, tests->ntests, tests->fileName);
 }
